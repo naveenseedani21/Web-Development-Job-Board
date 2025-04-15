@@ -112,17 +112,37 @@ export default function Home() {
       <section className="testimonials">
         <h2>What Our Users Say</h2>
         <div className="testimonial-cards">
+
+
           <div className="testimonial">
             <p>
               "UGA Job Finder completely changed my career! The tailored recommendations are spot on."
             </p>
             <span>- Bianca, Alum</span>
           </div>
+
+
           <div className="testimonial">
             <p>
               "I found the perfect opportunity through UGA Job Finder. It’s a must for every Bulldog!"
             </p>
             <span>- Naveen, Student</span>
+          </div>
+
+          <div className = "testimonial">
+            <p>
+              "This website is honestly so helpful, it is so nice to have every resource in the same place"
+            </p>
+            <span>- Shay, Student</span>
+          </div>
+
+          <div className = "testimonial">
+            <p>
+              "I don't know how this is a free tool, I'd sell my kidney for this"
+            </p>
+            <span>- Pratham, Student</span>
+
+
           </div>
         </div>
       </section>

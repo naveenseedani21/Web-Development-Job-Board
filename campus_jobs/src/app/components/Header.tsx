@@ -22,12 +22,12 @@ export default function Header() {
         <h1>UGA Job Finder</h1>
       </div>
       <nav className="nav">
-        <Link href="/">Home</Link>
-        <Link href="/splash">Splash</Link>
-        <Link href="/items">Jobs</Link>
+        <Link href="/" legacyBehavior>Home</Link>
+        <Link href="/splash" legacyBehavior>Splash</Link>
+        <Link href="/items" legacyBehavior>Jobs</Link>
         {isLoggedIn ? (
           <>
-            <Link href="/items/add">Add Job</Link>
+            <Link href="/items/add" legacyBehavior>Add Job</Link>
             <button onClick={handleAuthAction}>Logout</button>
           </>
         ) : (
