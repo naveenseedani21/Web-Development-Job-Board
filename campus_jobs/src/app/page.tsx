@@ -13,8 +13,8 @@ export default function Home() {
             with cutting-edge tools built for the UGA community.
           </p>
           <div className="cta">
-            <button 
-              className="btn primary" 
+            <button
+              className="btn primary"
               onMouseUp={(e) => e.currentTarget.blur()}
             >
               Browse Jobs
@@ -52,16 +52,76 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Resources Section */}
+      <section className="resources">
+        <h2>Resources</h2>
+        <div className="resource-grid">
+          <a
+            href="https://www.joinhandshake.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="resource-card"
+          >
+            <img
+              src="/handshake.png"
+              alt="Handshake"
+              width="250"
+              height="150"
+              style={{ objectFit: 'cover' }}
+            />
+            <h3>Handshake</h3>
+            <p>Explore UGA's official job platform.</p>
+          </a>
+          <a
+            href="https://www.ugajobevents.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="resource-card"
+          >
+            <img
+              src="/events.jpg"
+              alt="UGA Job Events"
+              width="250"
+              height="150"
+              style={{ objectFit: 'cover' }}
+            />
+            <h3>UGA Job Events</h3>
+            <p>Discover upcoming career and networking events.</p>
+          </a>
+          <a
+            href="https://career.uga.edu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="resource-card"
+          >
+            <img
+              src="/career.jpg"
+              alt="UGA Careers"
+              width="250"
+              height="150"
+              style={{ objectFit: 'cover' }}
+            />
+            <h3>UGA Careers</h3>
+            <p>Access career resources and advice for your future.</p>
+          </a>
+        </div>
+      </section>
+
+
       {/* Testimonials Section */}
       <section className="testimonials">
         <h2>What Our Users Say</h2>
         <div className="testimonial-cards">
           <div className="testimonial">
-            <p>"UGA Job Finder completely changed my career! The tailored recommendations are spot on."</p>
+            <p>
+              "UGA Job Finder completely changed my career! The tailored recommendations are spot on."
+            </p>
             <span>- Bianca, Alum</span>
           </div>
           <div className="testimonial">
-            <p>"I found the perfect opportunity through UGA Job Finder. It’s a must for every Bulldog!"</p>
+            <p>
+              "I found the perfect opportunity through UGA Job Finder. It’s a must for every Bulldog!"
+            </p>
             <span>- Naveen, Student</span>
           </div>
         </div>
@@ -71,8 +131,8 @@ export default function Home() {
       <section className="call-to-action">
         <h2>Ready to Take the Next Step?</h2>
         <p>Join our community and let UGA Job Finder propel your career forward.</p>
-        <button 
-          className="btn primary" 
+        <button
+          className="btn primary"
           onMouseUp={(e) => e.currentTarget.blur()}
         >
           Get Started Now
@@ -90,14 +150,13 @@ export default function Home() {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
             Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-
         /* Hero Section */
         .hero {
           position: relative;
           text-align: center;
           color: #fff;
           padding: 5rem 2rem;
-          background: linear-gradient(rgba(186, 12, 47, 0.15), rgba(186, 12, 47, 0.15)),
+          background: linear-gradient(rgba(186,12,47,0.15), rgba(186,12,47,0.15)),
             url('/hero-bg.jpg') center/cover no-repeat;
         }
         .hero-content {
@@ -146,12 +205,10 @@ export default function Home() {
           background-color: #ba0c2f;
           color: #fff;
         }
-        /* Remove focus outline */
         .btn:focus {
           outline: none;
           box-shadow: none;
         }
-
         /* Features Section */
         .features {
           padding: 2rem;
@@ -187,7 +244,49 @@ export default function Home() {
           font-size: 1rem;
           line-height: 1.4;
         }
-
+        /* Resources Section */
+        .resources {
+          padding: 2rem;
+          text-align: center;
+          background: #fff;
+        }
+        .resources h2 {
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
+          color: #ba0c2f;
+        }
+        .resource-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .resource-card {
+          background: #f9f9f9;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 1.5rem;
+          text-decoration: none;
+          color: inherit;
+          transition: transform 0.3s ease;
+        }
+        .resource-card:hover {
+          transform: translateY(-5px);
+        }
+        .resource-card img {
+          object-fit: cover;
+          border-radius: 4px;
+          margin-bottom: 1rem;
+        }
+        .resource-card h3 {
+          margin: 0.5rem 0;
+          color: #ba0c2f;
+        }
+        .resource-card p {
+          font-size: 0.95rem;
+          line-height: 1.4;
+        }
         /* Testimonials Section */
         .testimonials {
           background: #f3f3f3;
@@ -221,7 +320,6 @@ export default function Home() {
           font-weight: bold;
           color: #1e1e1e;
         }
-
         /* Call-to-Action Section */
         .call-to-action {
           text-align: center;
@@ -237,6 +335,12 @@ export default function Home() {
           font-size: 1.2rem;
           margin-bottom: 2rem;
         }
+        /*Resources Section */
+        .resources {
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #ba0c2f, #1e1e1e);
+        }
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -244,11 +348,13 @@ export default function Home() {
             font-size: 2.5rem;
           }
           .features h2,
-          .call-to-action h2 {
+          .call-to-action h2,
+          .resources h2 {
             font-size: 2rem;
           }
           .hero p,
-          .features p {
+          .features p,
+          .resource-card p {
             font-size: 1rem;
           }
           .cta {
