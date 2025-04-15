@@ -73,13 +73,13 @@ export default function Home() {
             <p>Explore UGA's official job platform.</p>
           </a>
           <a
-            href="https://www.ugajobevents.com"
+            href="https://career.uga.edu/calendar"
             target="_blank"
             rel="noopener noreferrer"
             className="resource-card"
           >
             <img
-              src="/events.jpg"
+              src="/jobs.jpg"
               alt="UGA Job Events"
               width="250"
               height="150"
@@ -89,13 +89,13 @@ export default function Home() {
             <p>Discover upcoming career and networking events.</p>
           </a>
           <a
-            href="https://career.uga.edu"
+            href="https://career.uga.edu/"
             target="_blank"
             rel="noopener noreferrer"
             className="resource-card"
           >
             <img
-              src="/career.jpg"
+              src="/center.jpg"
               alt="UGA Careers"
               width="250"
               height="150"
@@ -275,6 +275,8 @@ export default function Home() {
           transform: translateY(-5px);
         }
         .resource-card img {
+          width: 100%;
+          height: 150px;
           object-fit: cover;
           border-radius: 4px;
           margin-bottom: 1rem;
