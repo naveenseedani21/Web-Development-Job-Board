@@ -1,4 +1,4 @@
-// components/Header.tsx
+// src/app/components/Header.tsx
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -39,7 +39,7 @@ export default function Header() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1rem;
+          padding: 1.5rem 2rem;
           background-color: #f5f5f5;
         }
         .logo {
@@ -47,18 +47,38 @@ export default function Header() {
           align-items: center;
         }
         .logo h1 {
-          margin-left: 0.5rem;
+          margin-left: 0.75rem;
+          font-size: 1.5rem;
+          color: #ba0c2f; /* UGA Red */
+        }
+        .nav {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem; /* Increased gap between nav items */
         }
         .nav a {
-          margin-right: 1rem;
+          font-size: 1.1rem;
+          color: #333;
+          padding: 0.5rem 1rem;
+          transition: color 0.3s ease;
+          text-decoration: none;
+        }
+        .nav a:hover {
+          color: #ba0c2f;
         }
         button {
           padding: 0.5rem 1rem;
-          cursor: pointer;
-          background-color: #0070f3;
-          color: white;
-          border: none;
+          font-size: 1rem;
+          background-color: transparent;
+          border: 2px solid #ba0c2f;
           border-radius: 4px;
+          color: #ba0c2f;
+          cursor: pointer;
+          transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        button:hover {
+          background-color: #ba0c2f;
+          color: #fff;
         }
       `}</style>
     </header>
