@@ -1,4 +1,5 @@
 'use client'; // Enable client-side features and styled-jsx
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -8,7 +9,8 @@ export default function Home() {
         <div className="hero-content">
           <h1>Welcome to UGA Job Finder</h1>
           <p>
-            Your career journey begins here. Discover exclusive job opportunities and tailor your resume with cutting-edge tools built for the UGA community.
+            Your career journey begins here. Discover exclusive job opportunities and tailor your resume
+            with cutting-edge tools built for the UGA community.
           </p>
           <div className="cta">
             <button 
@@ -17,12 +19,10 @@ export default function Home() {
             >
               Browse Jobs
             </button>
-            <button 
-              className="btn secondary" 
-              onMouseUp={(e) => e.currentTarget.blur()}
-            >
-              Upload Resume
-            </button>
+            {/* Upload Resume button now links to the splash page */}
+            <Link href="/splash" legacyBehavior>
+              <a className="btn secondary">Upload Resume</a>
+            </Link>
           </div>
         </div>
       </section>
@@ -119,12 +119,14 @@ export default function Home() {
           justify-content: center;
           gap: 1rem;
         }
+        /* Button Styling */
         .btn {
           padding: 0.75rem 1.5rem;
           font-size: 1rem;
           border: none;
           cursor: pointer;
           border-radius: 4px;
+          text-decoration: none;
           transition: background 0.3s ease;
         }
         .btn.primary {
@@ -135,6 +137,7 @@ export default function Home() {
           background-color: #a50c29;
         }
         .btn.secondary {
+          display: inline-block;
           background-color: transparent;
           border: 2px solid #ba0c2f;
           color: #ba0c2f;

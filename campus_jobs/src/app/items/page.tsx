@@ -1,4 +1,5 @@
 // app/items/page.tsx
+'use client';
 import Item from '../components/Item';
 
 const items = [
