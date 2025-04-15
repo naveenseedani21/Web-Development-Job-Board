@@ -8,12 +8,21 @@ export default function Home() {
         <div className="hero-content">
           <h1>Welcome to UGA Job Finder</h1>
           <p>
-            Your career journey begins here. Discover exclusive job opportunities and tailor your
-            resume with cutting-edge tools built for the UGA community.
+            Your career journey begins here. Discover exclusive job opportunities and tailor your resume with cutting-edge tools built for the UGA community.
           </p>
           <div className="cta">
-            <button className="btn primary">Browse Jobs</button>
-            <button className="btn secondary">Upload Resume</button>
+            <button 
+              className="btn primary" 
+              onMouseUp={(e) => e.currentTarget.blur()}
+            >
+              Browse Jobs
+            </button>
+            <button 
+              className="btn secondary" 
+              onMouseUp={(e) => e.currentTarget.blur()}
+            >
+              Upload Resume
+            </button>
           </div>
         </div>
       </section>
@@ -24,15 +33,21 @@ export default function Home() {
         <div className="feature-cards">
           <div className="card">
             <h3>Official UGA Listings</h3>
-            <p>Access authentic job postings directly from UGA resources and partner organizations.</p>
+            <p>
+              Access authentic job postings directly from UGA resources and partner organizations.
+            </p>
           </div>
           <div className="card">
             <h3>Tailored Opportunities</h3>
-            <p>Receive personalized job recommendations based on your resume and skill set.</p>
+            <p>
+              Receive personalized job recommendations based on your resume and skill set.
+            </p>
           </div>
           <div className="card">
             <h3>Community & Networking</h3>
-            <p>Connect with fellow Bulldogs and expand your professional network effortlessly.</p>
+            <p>
+              Connect with fellow Bulldogs and expand your professional network effortlessly.
+            </p>
           </div>
         </div>
       </section>
@@ -56,7 +71,12 @@ export default function Home() {
       <section className="call-to-action">
         <h2>Ready to Take the Next Step?</h2>
         <p>Join our community and let UGA Job Finder propel your career forward.</p>
-        <button className="btn primary">Get Started Now</button>
+        <button 
+          className="btn primary" 
+          onMouseUp={(e) => e.currentTarget.blur()}
+        >
+          Get Started Now
+        </button>
       </section>
 
       <style jsx>{`
@@ -122,6 +142,11 @@ export default function Home() {
         .btn.secondary:hover {
           background-color: #ba0c2f;
           color: #fff;
+        }
+        /* Remove focus outline */
+        .btn:focus {
+          outline: none;
+          box-shadow: none;
         }
 
         /* Features Section */

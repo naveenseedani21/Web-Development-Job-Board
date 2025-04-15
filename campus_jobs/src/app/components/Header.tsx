@@ -18,7 +18,7 @@ export default function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <Image src="/logo.png" alt="UGA Job Finder Logo" width={50} height={50} />
+        <Image src="/logo.png" alt="UGA Job Finder Logo" width={50} height={70} />
         <h1>UGA Job Finder</h1>
       </div>
       <nav className="nav">
