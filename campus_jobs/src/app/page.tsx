@@ -19,9 +19,9 @@ export default function Home() {
             >
               Browse Jobs
             </button>
-            {/* Upload Resume button now links to the splash page */}
-            <Link href="/splash" legacyBehavior>
-              <a className="btn secondary">Upload Resume</a>
+            {/* Modern Link for Splash */}
+            <Link href="/splash" className="btn secondary">
+              Upload Resume
             </Link>
           </div>
         </div>
@@ -107,20 +107,16 @@ export default function Home() {
         </div>
       </section>
 
-
       {/* Testimonials Section */}
       <section className="testimonials">
         <h2>What Our Users Say</h2>
         <div className="testimonial-cards">
-
-
           <div className="testimonial">
             <p>
               "UGA Job Finder completely changed my career! The tailored recommendations are spot on."
             </p>
             <span>- Bianca, Alum</span>
           </div>
-
 
           <div className="testimonial">
             <p>
@@ -129,20 +125,18 @@ export default function Home() {
             <span>- Naveen, Student</span>
           </div>
 
-          <div className = "testimonial">
+          <div className="testimonial">
             <p>
               "This website is honestly so helpful, it is so nice to have every resource in the same place"
             </p>
             <span>- Shay, Student</span>
           </div>
 
-          <div className = "testimonial">
+          <div className="testimonial">
             <p>
               "I don't know how this is a free tool, I'd sell my kidney for this"
             </p>
             <span>- Pratham, Student</span>
-
-
           </div>
         </div>
       </section>
@@ -160,7 +154,6 @@ export default function Home() {
       </section>
 
       <style jsx>{`
-        /* Overall Page Container */
         .home {
           display: flex;
           flex-direction: column;
@@ -170,7 +163,6 @@ export default function Home() {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
             Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-        /* Hero Section */
         .hero {
           position: relative;
           text-align: center;
@@ -198,7 +190,6 @@ export default function Home() {
           justify-content: center;
           gap: 1rem;
         }
-        /* Button Styling */
         .btn {
           padding: 0.75rem 1.5rem;
           font-size: 1rem;
@@ -216,7 +207,6 @@ export default function Home() {
           background-color: #a50c29;
         }
         .btn.secondary {
-          display: inline-block;
           background-color: transparent;
           border: 2px solid #ba0c2f;
           color: #ba0c2f;
@@ -229,7 +219,6 @@ export default function Home() {
           outline: none;
           box-shadow: none;
         }
-        /* Features Section */
         .features {
           padding: 2rem;
           text-align: center;
@@ -264,16 +253,15 @@ export default function Home() {
           font-size: 1rem;
           line-height: 1.4;
         }
-        /* Resources Section */
         .resources {
           padding: 2rem;
           text-align: center;
-          background: #fff;
+          background: linear-gradient(135deg, #ba0c2f, #1e1e1e);
         }
         .resources h2 {
           font-size: 2.5rem;
           margin-bottom: 2rem;
-          color: #ba0c2f;
+          color: #f9f9f9;
         }
         .resource-grid {
           display: grid;
@@ -309,7 +297,6 @@ export default function Home() {
           font-size: 0.95rem;
           line-height: 1.4;
         }
-        /* Testimonials Section */
         .testimonials {
           background: #f3f3f3;
           padding: 2rem;
@@ -342,7 +329,6 @@ export default function Home() {
           font-weight: bold;
           color: #1e1e1e;
         }
-        /* Call-to-Action Section */
         .call-to-action {
           text-align: center;
           padding: 3rem 2rem;
@@ -357,14 +343,6 @@ export default function Home() {
           font-size: 1.2rem;
           margin-bottom: 2rem;
         }
-        /*Resources Section */
-        .resources {
-        padding: 2rem;
-        text-align: center;
-        background: linear-gradient(135deg, #ba0c2f, #1e1e1e);
-        }
-
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
           .hero h1 {
             font-size: 2.5rem;

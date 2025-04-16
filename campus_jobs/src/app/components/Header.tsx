@@ -1,5 +1,5 @@
-// src/app/components/Header.tsx
 'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from './AuthContext';
@@ -22,12 +22,12 @@ export default function Header() {
         <h1>UGA Job Finder</h1>
       </div>
       <nav className="nav">
-        <Link href="/" legacyBehavior>Home</Link>
-        <Link href="/splash" legacyBehavior>Splash</Link>
-        <Link href="/items" legacyBehavior>Jobs</Link>
+        <Link href="/">Home</Link>
+        <Link href="/splash">Splash</Link>
+        <Link href="/items">Jobs</Link>
         {isLoggedIn ? (
           <>
-            <Link href="/items/add" legacyBehavior>Add Job</Link>
+            <Link href="/items/add">Add Job</Link>
             <button onClick={handleAuthAction}>Logout</button>
           </>
         ) : (
@@ -49,21 +49,21 @@ export default function Header() {
         .logo h1 {
           margin-left: 0.75rem;
           font-size: 1.5rem;
-          color: #ba0c2f; /* UGA Red */
+          color: #ba0c2f;
         }
         .nav {
           display: flex;
           align-items: center;
-          gap: 1.5rem; /* Increased gap between nav items */
+          gap: 1.5rem;
         }
-        .nav a {
+        .nav :global(a) {
           font-size: 1.1rem;
           color: #333;
           padding: 0.5rem 1rem;
           transition: color 0.3s ease;
           text-decoration: none;
         }
-        .nav a:hover {
+        .nav :global(a:hover) {
           color: #ba0c2f;
         }
         button {
