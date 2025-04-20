@@ -2,18 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from './AuthContext';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Header() {
-  const { isLoggedIn, login, logout } = useAuth();
-
-  const handleAuthAction = () => {
-    if (isLoggedIn) {
-      logout();
-    } else {
-      login();
-    }
-  };
+  const { user, error, isLoading } = useUser();
 
   return (
     <header className="header">
@@ -21,19 +13,26 @@ export default function Header() {
         <Image src="/logo.png" alt="UGA Job Finder Logo" width={50} height={70} />
         <h1>UGA Job Finder</h1>
       </div>
+
       <nav className="nav">
         <Link href="/">Home</Link>
         <Link href="/splash">Splash</Link>
         <Link href="/items">Jobs</Link>
-        {isLoggedIn ? (
+
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error</p>
+        ) : user ? (
           <>
             <Link href="/items/add">Add Job</Link>
-            <button onClick={handleAuthAction}>Logout</button>
+            <a href="/api/auth/logout">Logout</a>
           </>
         ) : (
-          <button onClick={handleAuthAction}>Login / Signup</button>
+          <a href="/api/auth/login">Login / Signup</a>
         )}
       </nav>
+
       <style jsx>{`
         .header {
           display: flex;
