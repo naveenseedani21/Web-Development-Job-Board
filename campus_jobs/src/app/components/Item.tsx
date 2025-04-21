@@ -51,7 +51,7 @@ export default function Item({ title, image, company, link}: ItemProps) {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          height: 300px;
+          height: 340px;
 
         }
         .item:hover {
