@@ -1,7 +1,12 @@
-'use client'; // Enable client-side features and styled-jsx
+// src/app/page.tsx
+'use client'; // this page uses client‑side hooks
+
 import Link from 'next/link';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Home() {
+  const { user, error, isLoading } = useUser();
+
   return (
     <div className="home">
       {/* Hero Section */}
@@ -10,22 +15,38 @@ export default function Home() {
           <h1>Welcome to UGA Job Finder</h1>
           <p>
             Your career journey begins here. Discover exclusive job opportunities and tailor your resume
-            with cutting-edge tools built for the UGA community.
+            with cutting‑edge tools built for the UGA community.
           </p>
-
-          
           <div className="cta">
-          <Link
-            href="/items"
-            className="btn primary"
-            onMouseUp={e => e.currentTarget.blur()}
-          >Browse Jobs</Link>
-
-
-            
-            <Link href="/splash" className="btn secondary">
-              Upload Resume
+            <Link
+              href="/items"
+              className="btn primary"
+              onMouseUp={(e) => e.currentTarget.blur()}
+            >
+              Browse Jobs
             </Link>
+
+            {user ? (
+              <Link
+                href="/splash"
+                className="btn secondary"
+                onMouseUp={(e) => e.currentTarget.blur()}
+              >
+                Upload Resume
+              </Link>
+            ) : (
+              <>
+                <button
+                  className="btn secondary disabled"
+                  disabled
+                >
+                  Upload Resume
+                </button>
+                <p className="auth-note">
+                  Please sign in / log in to use this functionality.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -120,24 +141,21 @@ export default function Home() {
             </p>
             <span>- Bianca, Alum</span>
           </div>
-
           <div className="testimonial">
             <p>
               "I found the perfect opportunity through UGA Job Finder. It’s a must for every Bulldog!"
             </p>
             <span>- Naveen, Student</span>
           </div>
-
           <div className="testimonial">
             <p>
               "This website is honestly so helpful, it is so nice to have every resource in the same place"
             </p>
             <span>- Shay, Student</span>
           </div>
-
           <div className="testimonial">
             <p>
-              "How is this a free tool? I'd sell my kidney for this"
+              "I don't know how this is a free tool, I'd sell my kidney for this"
             </p>
             <span>- Pratham, Student</span>
           </div>
@@ -145,22 +163,19 @@ export default function Home() {
       </section>
 
       {/* Call-to-Action Section */}
-    
-
       <section className="call-to-action">
         <h2>Ready to Take the Next Step?</h2>
         <p>Join our community and let UGA Job Finder propel your career forward.</p>
-        <button
+        <a
+          href="/api/auth/login?screen_hint=signup"
           className="btn primary"
-          onClick={() => (window.location.href = '/api/auth/login?screen_hint=signup')}
           onMouseUp={(e) => e.currentTarget.blur()}
         >
           Get Started Now
-        </button>
+        </a>
       </section>
 
-
-      {/* GLOBAL styles so Link-generated <a> gets the .btn rules */}
+      {/* GLOBAL styles so the disabled state and auth-note are scoped */}
       <style jsx global>{`
         .home {
           display: flex;
@@ -195,11 +210,12 @@ export default function Home() {
         }
         .cta {
           display: flex;
-          justify-content: center;
-          gap: 1rem;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
         }
 
-        /* ——— BUTTON STYLES GLOBAL ——— */
+        /* BUTTON STYLES GLOBAL */
         .btn {
           padding: 0.75rem 1.5rem;
           font-size: 1rem;
@@ -228,12 +244,27 @@ export default function Home() {
           background-color: #ba0c2f;
           color: #fff;
         }
+
+        /* disabled Upload Resume */
+        .btn.secondary.disabled {
+          background-color: #e0e0e0;
+          border-color: #e0e0e0;
+          color: #888;
+          cursor: not-allowed;
+        }
+
+        /* note under disabled button */
+        .auth-note {
+          margin-top: 0.25rem;
+          font-size: 0.9rem;
+          color: #666;
+          text-align: center;
+        }
+
         .btn:focus {
           outline: none;
           box-shadow: none;
         }
-
-        /* ——— REST OF YOUR STYLES (global) ——— */
         .features {
           padding: 2rem;
           text-align: center;
