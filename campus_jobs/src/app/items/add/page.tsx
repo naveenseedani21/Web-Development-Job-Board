@@ -6,16 +6,38 @@ import { useRouter } from 'next/navigation';
 export default function AddItemPage() {
   const [title, setTitle] = useState('');
   const [image, setImage] = useState('');
+  const [company, setCompany] = useState('');
+
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('New Job:', { title, image });
-    // Clear the form fields
-    setTitle('');
-    setImage('');
-    // Redirect to job listings
-    router.push('/items');
+
+    try {
+      const res = await fetch('/api/jobs/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          image: image || '/default-job.png',
+          company,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to add job');
+
+      // Clear the form fields
+      setTitle('');
+      setImage('');
+      setCompany('');
+      // Redirect to job listings
+      router.push('/items');
+    } catch (err) {
+      console.error('Error adding job:', err);
+      alert('Failed to add job');
+    }
   };
 
   return (
@@ -39,6 +61,15 @@ export default function AddItemPage() {
             onChange={(e) => setImage(e.target.value)}
             required
           />
+        </div>
+        <div>
+          <label>Company:</label>
+          <input
+            type="text"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            required
+          /> 
         </div>
         <button type="submit">Add Job</button>
       </form>

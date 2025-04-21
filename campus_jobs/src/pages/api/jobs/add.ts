@@ -7,8 +7,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await connectMongo();
-    const job = await Job.create(req.body);
-    res.status(201).json({ job });
+    const { title, company, image, link} = req.body;
+
+    const newJob = await Job.create({
+      title,
+      company,
+      image: image || '/default-image.jpg',
+      link: '#',
+    });
+
+    res.status(201).json({ message: 'Job Added', job: newJob });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create job', details: error });
   }
