@@ -12,14 +12,17 @@ export default function Home() {
             Your career journey begins here. Discover exclusive job opportunities and tailor your resume
             with cutting-edge tools built for the UGA community.
           </p>
+
+          
           <div className="cta">
-            <button
-              className="btn primary"
-              onMouseUp={(e) => e.currentTarget.blur()}
-            >
-              Browse Jobs
-            </button>
-            {/* Modern Link for Splash */}
+          <Link
+            href="/jobs"
+            className="btn primary"
+            onMouseUp={e => e.currentTarget.blur()}
+          >Browse Jobs</Link>
+
+
+            
             <Link href="/splash" className="btn secondary">
               Upload Resume
             </Link>
@@ -134,7 +137,7 @@ export default function Home() {
 
           <div className="testimonial">
             <p>
-              "I don't know how this is a free tool, I'd sell my kidney for this"
+              "How is this a free tool? I'd sell my kidney for this"
             </p>
             <span>- Pratham, Student</span>
           </div>
@@ -153,7 +156,8 @@ export default function Home() {
         </button>
       </section>
 
-      <style jsx>{`
+      {/* GLOBAL styles so Link-generated <a> gets the .btn rules */}
+      <style jsx global>{`
         .home {
           display: flex;
           flex-direction: column;
@@ -190,6 +194,8 @@ export default function Home() {
           justify-content: center;
           gap: 1rem;
         }
+
+        /* ——— BUTTON STYLES GLOBAL ——— */
         .btn {
           padding: 0.75rem 1.5rem;
           font-size: 1rem;
@@ -198,6 +204,9 @@ export default function Home() {
           border-radius: 4px;
           text-decoration: none;
           transition: background 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
         .btn.primary {
           background-color: #ba0c2f;
@@ -219,6 +228,8 @@ export default function Home() {
           outline: none;
           box-shadow: none;
         }
+
+        /* ——— REST OF YOUR STYLES (global) ——— */
         .features {
           padding: 2rem;
           text-align: center;
