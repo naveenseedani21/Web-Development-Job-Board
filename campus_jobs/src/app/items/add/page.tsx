@@ -21,7 +21,7 @@ export default function AddItemPage() {
         },
         body: JSON.stringify({
           title,
-          image: image || '/default-job.png',
+          image: image,
           company,
         }),
       });
@@ -57,7 +57,7 @@ export default function AddItemPage() {
           <label>Image URL:</label>
           <input
             type="text"
-            value={image || '/default-job.png'}
+            value={image}
             onChange={(e) => setImage(e.target.value)}
             required
           />

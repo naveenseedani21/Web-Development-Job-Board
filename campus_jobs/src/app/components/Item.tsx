@@ -12,7 +12,13 @@ interface ItemProps {
   onClick?: () => void;
 }
 
+function getRandomStockImage(): string {
+  const index = Math.floor(Math.random() * 6) + 1; // 1 to 6
+  return `/default-image${index}.jpeg`;
+}
+
 export default function Item({ title, image, company, link}: ItemProps) {
+  const displayImage = image?.trim() ? image : getRandomStockImage();
   return (
     <a
       href={link || '#'}
@@ -22,7 +28,7 @@ export default function Item({ title, image, company, link}: ItemProps) {
     >
       <div className="image-wrapper">
         <Image
-          src={image || '/default-job.png'}
+          src={displayImage}
           alt={title}
           width={200}
           height={150}

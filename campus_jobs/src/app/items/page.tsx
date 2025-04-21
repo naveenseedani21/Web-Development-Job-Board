@@ -42,7 +42,7 @@ export default function ItemsPage() {
     setJobs(valid);
     setBrokenJobs(broken);
 
-    const companySet: Set<string> = new Set(valid.map((job) => job.company || 'Unknown'));
+    const companySet: Set<string> = new Set(valid.map((job: { company: any; }) => job.company || 'Unknown'));
     setUniqueCompanies(Array.from(companySet).sort());
   };
 
@@ -104,13 +104,13 @@ export default function ItemsPage() {
       {filteredJobs.map((job) => {
         console.log('Rendering job:', job); // debug this
         return (
-        <Item 
-          key={job._id} 
-          title={job.title} 
-          image={job.image || '/default-job.png'}
-          company={job.company}
-          link={job.link}
-        />
+          <Item 
+            key={job._id} 
+            title={job.title} 
+            image={job.image}
+            company={job.company}
+            link={job.link}
+          />
         );
       })}
       </div>
@@ -123,7 +123,7 @@ export default function ItemsPage() {
               <Item 
                 key={i} 
                 title={job.title} 
-                image={job.image || '/default-job.png'}
+                image={job.image}
                 company={job.company}
                 link={job.link}
               />
