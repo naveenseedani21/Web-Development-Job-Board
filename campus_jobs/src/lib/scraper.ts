@@ -5,7 +5,6 @@ export interface ScrapedJob {
   department: string;
   postedDate: string;
   link: string;
-  company: string;
 }
 
 export async function scrapeUGAJobs(): Promise<ScrapedJob[]> {
@@ -15,19 +14,29 @@ export async function scrapeUGAJobs(): Promise<ScrapedJob[]> {
     waitUntil: 'networkidle2',
   });
 
-  await page.waitForSelector('.row'); // Ensure jobs have loaded
+  await page.waitForSelector('#search_results');
 
   const jobs = await page.evaluate(() => {
-    const jobElements = Array.from(document.querySelectorAll('.row'));
+    const jobElements = Array.from(document.querySelectorAll('.job-item-posting'));
+
     return jobElements.map(el => {
-      const title = el.querySelector('a.title')?.textContent?.trim() || 'Untitled';
-      const department = el.querySelector('.department')?.textContent?.trim() || 'N/A';
-      const postedDate = el.querySelector('.posted')?.textContent?.trim() || 'N/A';
-      const link = (el.querySelector('a.title') as HTMLAnchorElement)?.href || '';
-      const company = department; // Fallback - Assuming department is the company name
-      return { title, department, postedDate, link, company };
+      const title = el.querySelector('h3 > a')?.textContent?.trim() || 'Untitled';
+      const linkSuffix = el.querySelector('h3 > a')?.getAttribute('href') || '';
+      const link = `https://www.ugajobsearch.com${linkSuffix}`;
+
+      const department = el.querySelectorAll('.col-md-2.col-xs-12.job-title')[1]?.textContent?.trim() || 'N/A';
+      const postedDate = el.querySelectorAll('.col-md-2.col-xs-12.job-title')[3]?.textContent?.trim() || 'N/A';
+
+      return {
+        title,
+        department,
+        postedDate,
+        link,
+      };
     });
   });
+
+  console.log(jobs.slice(0, 3));
 
   await browser.close();
   return jobs;

@@ -1,7 +1,6 @@
 // components/Item.tsx
 'use client';
-
-import Image from 'next/image';
+import NextImage from 'next/image';
 
 interface ItemProps {
   title: string;
@@ -11,7 +10,13 @@ interface ItemProps {
 export default function Item({ title, image }: ItemProps) {
   return (
     <div className="item">
-      <Image src={image} alt={title} width={200} height={150} />
+      <NextImage 
+  src={image || '/default-job.png'} 
+  alt={title} 
+  width={200} 
+  height={150}
+/>
+
       <h3>{title}</h3>
       <style jsx>{`
         .item {

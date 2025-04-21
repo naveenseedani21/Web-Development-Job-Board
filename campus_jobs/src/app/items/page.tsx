@@ -62,7 +62,8 @@ export default function ItemsPage() {
           <Item 
           key={job._id} 
           title={job.title} 
-          image={job.image || '/default-job.jpg'} // fallback 
+          image={job.image || '/default-job.png'}
+
           />
         ))}
       </div>
