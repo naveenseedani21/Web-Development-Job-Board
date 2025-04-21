@@ -35,7 +35,7 @@ export default function AddItemPage() {
           <label>Image URL:</label>
           <input
             type="text"
-            value={image}
+            value={image || '/default-job.png'}
             onChange={(e) => setImage(e.target.value)}
             required
           />
