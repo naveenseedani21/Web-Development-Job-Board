@@ -11,11 +11,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const { validJobs, brokenJobs } = await scrapeUGAJobs();
-    await connectMongo(); // Connect to MongoDB via Mongoose
+    await connectMongo();
 
-    await JobModel.deleteMany({}); // Clear old jobs
-    await JobModel.insertMany(validJobs); // Save new jobs
-    
+    await JobModel.deleteMany({});
+    await JobModel.insertMany(validJobs);
+   
+    console.log('First job to insert:', validJobs[0]);
     console.log('Broken Jobs:', brokenJobs);
 
     res.status(200).json({ message: 'Jobs synced', count: validJobs.length });

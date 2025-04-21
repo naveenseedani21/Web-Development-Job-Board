@@ -8,48 +8,67 @@ export interface ScrapedJob {
 }
 
 export async function scrapeUGAJobs(): Promise<{ validJobs: ScrapedJob[]; brokenJobs: ScrapedJob[] }> {
-
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto('https://www.ugajobsearch.com/postings/search', {
-    waitUntil: 'networkidle2',
-  });
 
-  await page.waitForSelector('.job-item-posting');
- 
-  const { validJobs, brokenJobs } = await page.evaluate(() => {
-    const jobElements = Array.from(document.querySelectorAll('.job-item-posting'));
+  const validJobs: ScrapedJob[] = [];
+  const brokenJobs: ScrapedJob[] = [];
 
-    const validJobs: any[] = [];
-    const brokenJobs: any[] = [];
+  let pageNumber = 1;
+  let hasMorePages = true;
 
-    jobElements.forEach(el => {
-      const anchor = el.querySelector('h3 > a');
-      const title = anchor?.textContent?.trim() || 'Untitled';
-      const linkSuffix = anchor?.getAttribute('href') || '';
-      const link = `https://www.ugajobsearch.com${linkSuffix}`;
-      const cols = el.querySelectorAll('.col-md-2.col-xs-12.job-title');
-      const department = cols[1]?.textContent?.trim() || 'N/A';
-      const postedDate = cols[3]?.textContent?.trim() || 'N/A';
+  while (hasMorePages) {
+    const url = `https://www.ugajobsearch.com/postings/search?page=${pageNumber}`;
+    console.log(`Scraping ${url}`);
+    await page.goto(url, { waitUntil: 'networkidle2' });
 
-      const job = {
-        title: title || 'Untitled',
-        company: department,
-        postedDate,
-        link,
-      };
+    const { pageValidJobs, pageBrokenJobs } = await page.evaluate(() => {
+      const jobElements = Array.from(document.querySelectorAll('.job-item-posting'));
+      const pageValidJobs: any[] = [];
+      const pageBrokenJobs: any[] = [];
 
-      if (title && title.length > 0) {
-        validJobs.push(job);
-      } else {
-        brokenJobs.push(job);
+      if (jobElements.length === 0) {
+        return { pageValidJobs, pageBrokenJobs };
       }
-    });
-    return { validJobs, brokenJobs };
-  });
 
-  console.log('First scraped job:', validJobs[0]);
+      jobElements.forEach(el => {
+        const anchor = el.querySelector('h3 > a');
+        const title = anchor?.textContent?.trim() || 'Untitled';
+        const linkSuffix = anchor?.getAttribute('href') || '';
+        const link = `https://www.ugajobsearch.com${linkSuffix}`;
+        const cols = el.querySelectorAll('.col-md-2.col-xs-12.job-title');
+        const department = cols[1]?.textContent?.trim() || 'N/A';
+        const postedDate = cols[3]?.textContent?.trim() || 'N/A';
+
+        const job = {
+          title: title || 'Untitled',
+          company: department,
+          postedDate,
+          link,
+        };
+
+        if (title && title.length > 0) {
+          pageValidJobs.push(job);
+        } else {
+          pageBrokenJobs.push(job);
+        }
+      });
+
+      return { pageValidJobs, pageBrokenJobs };
+    });
+
+    if (pageValidJobs.length === 0) {
+      hasMorePages = false;
+    } else {
+      validJobs.push(...pageValidJobs);
+      brokenJobs.push(...pageBrokenJobs);
+      pageNumber++;
+    }
+  }
 
   await browser.close();
+
+  console.log(`Scraped ${validJobs.length} valid jobs`);
+  console.log(`Scraped ${brokenJobs.length} broken jobs`);
   return { validJobs, brokenJobs };
 }

@@ -20,16 +20,24 @@ export default function Item({ title, image, company, link}: ItemProps) {
       rel="noopener noreferrer"
       className="item"
     >
-      <Image
-        src={image || '/default-job.png'}
-        alt={title}
-        width={200}
-        height={150}
-      />
+      <div className="image-wrapper">
+        <Image
+          src={image || '/default-job.png'}
+          alt={title}
+          width={200}
+          height={150}
+        />
+      </div>
       <h3>{title}</h3>
       {company?.trim() && <p className="comp">{company}</p>}
       
       <style jsx>{`
+        .image-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 0.5rem;
+        }
         .item-link {
           text-decoration: none;
           color: inherit;
