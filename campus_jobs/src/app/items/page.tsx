@@ -7,42 +7,43 @@ interface job {
   _id: string;
   title: string;
   image?: string;
+  link?: string;
+  company?: string;
 }
-// const items = [
-//   {
-//     id: 1,
-//     title: 'Software Engineer',
-//     image: '/job1.jpg'
-//   },
-//   {
-//     id: 2,
-//     title: 'Data Analyst',
-//     image: '/job2.jpg'
-//   },
-//   {
-//     id: 3,
-//     title: 'Cyber Security Specialist',
-//     image: '/job3.jpg'
-//   },
-// ];
 
 export default function ItemsPage() {
   const [jobs, setJobs] = useState<job[]>([]);
   const [loading, setLoading] = useState(false);
+  const [brokenJobs, setBrokenJobs] = useState<job[]>([]);
 
   const fetchJobs = async () => {
     const res = await fetch('/api/jobs');
     const data = await res.json();
-    setJobs(data.jobs);
+
+    console.log('Fetched jobs:', data.jobs);
+    
+    const valid = data.jobs.filter((job: job) => job.title !== 'Untitled');
+    const broken = data.jobs.filter((job: job) => job.title === 'Untitled');
+
+    setJobs(valid);
+    setBrokenJobs(broken);
   };
 
   const syncJobs = async () => {
     setLoading(true);
-    const res = await fetch('/api/jobs/sync');
-    const data = await res.json();
-    await fetchJobs();
-    setLoading(false);
-    alert(`Synced ${data.count} jobs!`);
+    try {
+      const res = await fetch('/api/jobs/sync');
+      if (!res.ok) throw new Error('Sync failed');
+      const data = await res.json();
+      await fetchJobs();
+      
+      alert(`Synced ${data.count} jobs!`);
+    } catch (err) {
+      console.error('Sync error:', err);
+      alert('Failed to sync jobs.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -58,15 +59,36 @@ export default function ItemsPage() {
       </button>
 
       <div className="item-list">
-        {jobs.map((job) => (
-          <Item 
+      {jobs.map((job) => {
+        console.log('Rendering job:', job); // debug this
+        return (
+        <Item 
           key={job._id} 
           title={job.title} 
           image={job.image || '/default-job.png'}
-
-          />
-        ))}
+          company={job.company}
+          link={job.link}
+        />
+        );
+      })}
       </div>
+
+      {brokenJobs.length > 0 && (
+        <>
+          <h3 style={{ marginTop: '2rem' }}> Jobs Missing Titles</h3>
+          <div className="item-list">
+            {brokenJobs.map((job, i) => (
+              <Item 
+                key={i} 
+                title={job.title} 
+                image={job.image || '/default-job.png'}
+                company={job.company}
+                link={job.link}
+              />
+            ))}
+        </div>
+        </>
+      )}
 
       <style jsx>{`
         .items {
@@ -89,6 +111,9 @@ export default function ItemsPage() {
         button:disabled {
           background-color: gray;
           cursor: not-allowed;
+        }
+        h3 {
+          margin-top: 1rem;
         }
       `}</style>
     </div>

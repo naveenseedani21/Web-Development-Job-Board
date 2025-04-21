@@ -10,13 +10,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const scrapedJobs = await scrapeUGAJobs();
+    const { validJobs, brokenJobs } = await scrapeUGAJobs();
     await connectMongo(); // Connect to MongoDB via Mongoose
 
     await JobModel.deleteMany({}); // Clear old jobs
-    await JobModel.insertMany(scrapedJobs); // Save new jobs
+    await JobModel.insertMany(validJobs); // Save new jobs
+    
+    console.log('Broken Jobs:', brokenJobs);
 
-    res.status(200).json({ message: 'Jobs synced', count: scrapedJobs.length });
+    res.status(200).json({ message: 'Jobs synced', count: validJobs.length });
   } catch (err) {
     console.error('Error syncing jobs:', err);
     res.status(500).json({ message: 'Error syncing jobs' });
