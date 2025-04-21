@@ -16,7 +16,7 @@ export default function Home() {
           
           <div className="cta">
           <Link
-            href="/jobs"
+            href="/items"
             className="btn primary"
             onMouseUp={e => e.currentTarget.blur()}
           >Browse Jobs</Link>
