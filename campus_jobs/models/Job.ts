@@ -6,7 +6,8 @@ const JobSchema = new mongoose.Schema({
   link: { type: String, required: true },
   description: { type: String },
   location: { type: String },
-  postedAt: { type: Date, default: Date.now }
+  postedAt: { type: Date, default: Date.now },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }]
 });
 
 export default mongoose.models.Job || mongoose.model('Job', JobSchema);

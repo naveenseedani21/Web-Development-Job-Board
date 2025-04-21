@@ -2,6 +2,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Item from '../components/Item';
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 interface job {
   _id: string;
@@ -12,12 +14,26 @@ interface job {
 }
 
 export default function ItemsPage() {
+  const { user } = useUser();
+  const loggedIn = !!user;
   const [jobs, setJobs] = useState<job[]>([]);
   const [loading, setLoading] = useState(false);
   const [brokenJobs, setBrokenJobs] = useState<job[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('');
   const [uniqueCompanies, setUniqueCompanies] = useState<string[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
+
+  const toggleFavorite = (jobId: string) => {
+    const updated = favorites.includes(jobId)
+      ? favorites.filter(id => id !== jobId)
+      : [...favorites, jobId];
+    setFavorites(updated);
+    localStorage.setItem('favorites', JSON.stringify(updated));
+  }
 
   const filteredJobs = jobs.filter((job) => {
     const matchesQuery =
@@ -26,8 +42,11 @@ export default function ItemsPage() {
 
     const matchCompany = 
       selectedCompany === '' || job.company === selectedCompany;
-
-    return matchesQuery && matchCompany;
+    
+    const matchFavorite =
+      !showFavoritesOnly || favorites.includes(job._id);
+  
+    return matchesQuery && matchCompany && matchFavorite;
   });
   
   const fetchJobs = async () => {
@@ -70,7 +89,7 @@ export default function ItemsPage() {
   return (
     <div className="items">
       <h2>Job Listings</h2>
-      <div className="search-filter-sync-wrapper">
+      <div className="search-filter-sync-wrapper"> 
         <input
           type="text"
           placeholder="Search jobs by title or department..."
@@ -91,13 +110,28 @@ export default function ItemsPage() {
             </option>
           ))}
         </select>
+        <label className="favorite-toggle">
+          <input
+            type="checkbox"
+            checked={showFavoritesOnly}
+            onChange={() => setShowFavoritesOnly(!showFavoritesOnly)}
+          />
+          Favorites Only
+        </label>
       </div>
 
       <div className="jobs-found-sync">
         <p className="job-count">{filteredJobs.length} jobs found</p>
-        <button onClick={syncJobs} disabled={loading}>
-          {loading ? 'Syncing...' : 'Sync Jobs'}
-        </button>
+        <div className="button-group">
+          <button onClick={syncJobs} disabled={loading}>
+            {loading ? 'Syncing...' : 'Sync Jobs'}
+          </button>
+          {user && (
+            <button onClick={() => setEditMode(!editMode)}>
+              {editMode ? 'Done Editing' : 'Edit Jobs'}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="item-list">
@@ -105,11 +139,17 @@ export default function ItemsPage() {
         console.log('Rendering job:', job); // debug this
         return (
           <Item 
-            key={job._id} 
-            title={job.title} 
+            key={job._id}
+            title={job.title}
             image={job.image}
             company={job.company}
             link={job.link}
+            jobId={job._id}
+            showDelete={editMode && !!user}
+            onDelete={fetchJobs}
+            isFavorite={favorites.includes(job._id)}
+            onToggleFavorite={() => toggleFavorite(job._id)}
+            loggedIn={loggedIn}
           />
         );
       })}
@@ -121,11 +161,14 @@ export default function ItemsPage() {
           <div className="item-list">
             {brokenJobs.map((job, i) => (
               <Item 
-                key={i} 
-                title={job.title} 
-                image={job.image}
-                company={job.company}
-                link={job.link}
+              key={i} 
+              title={job.title} 
+              image={job.image}
+              company={job.company}
+              link={job.link}
+              jobId={job._id}
+              showDelete={editMode}
+              onDelete={fetchJobs}
               />
             ))}
         </div>
@@ -133,6 +176,10 @@ export default function ItemsPage() {
       )}
 
       <style jsx>{`
+        .button-group {
+          display: flex;
+          gap: 0.5rem;
+        }
         .items {
           padding: 2rem;
         }
@@ -146,6 +193,12 @@ export default function ItemsPage() {
           gap: 1rem;
           flex-wrap: wrap;
           margin-bottom: 1rem;
+        }
+        .favorite-toggle {
+          display: flex;
+          align-items: center;
+          font-size: 1rem;
+          gap: 0.5rem;
         }
         .company-select {
           padding: 0.5rem;
