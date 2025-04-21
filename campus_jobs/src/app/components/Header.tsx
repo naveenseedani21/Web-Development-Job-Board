@@ -1,3 +1,4 @@
+// src/app/components/Header.tsx
 'use client';
 
 import Link from 'next/link';
@@ -9,14 +10,20 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="logo">
-        <Image src="/logo.png" alt="UGA Job Finder Logo" width={50} height={70} />
-        <h1>UGA Job Finder</h1>
-      </div>
+      {/* Logo now links home */}
+      <Link href="/" className="logo-link">
+        <div className="logo">
+          <Image
+            src="/logo.png"
+            alt="UGA Job Finder Logo"
+            width={50}
+            height={70}
+          />
+          <h1>UGA Job Finder</h1>
+        </div>
+      </Link>
 
       <nav className="nav">
-        <Link href="/">Home</Link>
-        <Link href="/splash">Splash</Link>
         <Link href="/items">Jobs</Link>
 
         {isLoading ? (
@@ -40,6 +47,11 @@ export default function Header() {
           align-items: center;
           padding: 1.5rem 2rem;
           background-color: #f5f5f5;
+        }
+        .logo-link {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
         }
         .logo {
           display: flex;
@@ -65,19 +77,11 @@ export default function Header() {
         .nav :global(a:hover) {
           color: #ba0c2f;
         }
-        button {
+        .nav p {
+          font-size: 1.1rem;
+          color: #333;
+          margin: 0;
           padding: 0.5rem 1rem;
-          font-size: 1rem;
-          background-color: transparent;
-          border: 2px solid #ba0c2f;
-          border-radius: 4px;
-          color: #ba0c2f;
-          cursor: pointer;
-          transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        button:hover {
-          background-color: #ba0c2f;
-          color: #fff;
         }
       `}</style>
     </header>
