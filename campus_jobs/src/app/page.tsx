@@ -145,16 +145,20 @@ export default function Home() {
       </section>
 
       {/* Call-to-Action Section */}
+    
+
       <section className="call-to-action">
         <h2>Ready to Take the Next Step?</h2>
         <p>Join our community and let UGA Job Finder propel your career forward.</p>
         <button
           className="btn primary"
+          onClick={() => (window.location.href = '/api/auth/login?screen_hint=signup')}
           onMouseUp={(e) => e.currentTarget.blur()}
         >
           Get Started Now
         </button>
       </section>
+
 
       {/* GLOBAL styles so Link-generated <a> gets the .btn rules */}
       <style jsx global>{`
