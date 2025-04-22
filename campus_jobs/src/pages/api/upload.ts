@@ -1,13 +1,13 @@
 // src/pages/api/upload.ts
-
 import connectMongo from '@/lib/mongo';
 import { File as FormidableFile, IncomingForm } from 'formidable';
 import fs from 'fs';
-import mammoth from 'mammoth';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import os from 'os';
-import pdfParse from 'pdf-parse';
 import JobModel from '../../../models/Job';
+import { fetch } from 'undici';
+
+console.log("✅ ENV VALUE:", process.env.RESUME_PARSER_KEY);
 
 export const config = {
   api: {
@@ -16,34 +16,66 @@ export const config = {
 };
 
 /**
- * Extract plain text from PDF or Word.
+ * Parse resume using Resume Parser API (titles + skills)
  */
-async function extractText(file: FormidableFile): Promise<string> {
+async function extractTitleAndSkills(file: FormidableFile): Promise<{ titles: string[]; skills: string[] }> {
   const filePath = file.filepath;
-  if (!filePath) throw new Error('Uploaded file path not found');
+  // const apiKey = process.env.RESUME_PARSER_KEY;
+  const apiKey = 'L4IDub8Im7B0hUX0peo4RrQOGL6ytZx9';
+  console.log("API KEY?", process.env.RESUME_PARSER_KEY);
+  if (!apiKey) throw new Error("Missing Resume Parser API key");
+  if (!filePath) throw new Error('Missing Resume Parser API key');
 
-  const origName = file.originalFilename ?? '';
-  const ext = origName.split('.').pop()?.toLowerCase() ?? '';
-  const mime = file.mimetype ?? '';
+  const resumeStream = fs.createReadStream(filePath);
+  const headers: HeadersInit = {
+    'Content-Type': 'application/octet-stream',
+    'apikey': apiKey,
+  };
 
-  // PDF
-  if (mime.includes('pdf') || ext === 'pdf') {
-    const buffer = fs.readFileSync(filePath);
-    return (await pdfParse(buffer)).text;
+  const response = await fetch('https://api.apilayer.com/resume_parser/upload', {
+    method: 'POST',
+    headers,
+    body: resumeStream,
+    duplex: 'half', 
+  }); 
+
+  const raw = await response.text();
+  console.log('Resume Parser API response:', raw);
+
+  if (!response.ok) {
+    throw new Error(`Resume Parser API error: ${response.status} - ${raw}`);
   }
 
-  // Word
-  if (mime.includes('word') || ext === 'doc' || ext === 'docx') {
-    return (await mammoth.extractRawText({ path: filePath })).value;
-  }
+  const data = JSON.parse(raw);
+  const skills: string[] = data.skills || [];
+  const titles: string[] = (data.experience || [])
+    .map((exp: any) => exp.title)
+    .filter((title: any) => typeof title === 'string' && title.trim().length > 0);
 
-  // Fallback: try PDF → then Word
-  try {
-    const buffer = fs.readFileSync(filePath);
-    return (await pdfParse(buffer)).text;
-  } catch {
-    return (await mammoth.extractRawText({ path: filePath })).value;
-  }
+  return { titles, skills };
+
+  // const origName = file.originalFilename ?? '';
+  // const ext = origName.split('.').pop()?.toLowerCase() ?? '';
+  // const mime = file.mimetype ?? '';
+
+  // // PDF
+  // if (mime.includes('pdf') || ext === 'pdf') {
+  //   const buffer = fs.readFileSync(filePath);
+  //   return (await pdfParse(buffer)).text;
+  // }
+
+  // // Word
+  // if (mime.includes('word') || ext === 'doc' || ext === 'docx') {
+  //   return (await mammoth.extractRawText({ path: filePath })).value;
+  // }
+
+  // // Fallback: try PDF → then Word
+  // try {
+  //   const buffer = fs.readFileSync(filePath);
+  //   return (await pdfParse(buffer)).text;
+  // } catch {
+  //   return (await mammoth.extractRawText({ path: filePath })).value;
+  // }
 }
 
 export default async function handler(
@@ -55,7 +87,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // 1) Parse the multipart form
+  // 1. Parse form & file
   let files: Record<string, FormidableFile | FormidableFile[]>;
   try {
     const form = new IncomingForm({
@@ -66,7 +98,7 @@ export default async function handler(
       fields: unknown;
       files: Record<string, FormidableFile | FormidableFile[]>;
     }>((resolve, reject) =>
-      form.parse(req, (err, fields, files) =>
+      form.parse(req, (err: any, fields: any, files: any) =>
         err ? reject(err) : resolve({ fields, files })
       )
     );
@@ -76,51 +108,52 @@ export default async function handler(
     return res.status(500).json({ error: 'Error parsing upload' });
   }
 
-  // 2) Get the uploaded file
   const uploaded = files.file;
   if (!uploaded) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
   const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
 
-  // 3) Extract text from resume
-  let text: string;
+  if (file.size > 2 * 1024 * 1024) {
+    return res.status(400).json({ error: 'File too large (max 2MB)' });
+  }
+
+  // 2. Extract experience titles and skills
+  let titles: string[] = [];
+  let skills: string[] = [];
   try {
-    text = await extractText(file);
-  } catch (err: any) {
+    const parsed = await extractTitleAndSkills(file);
+    titles = parsed.titles;
+    skills = parsed.skills;
+  } catch (err: any) { 
     console.error('Resume parsing error:', err);
     const status = err.message.includes('not found') ? 400 : 500;
     return res.status(status).json({ error: err.message });
   }
 
-  // 4) Build keyword list
-  const resumeWords = Array.from(
-    new Set(
-      text
-        .toLowerCase()
-        .split(/\W+/)
-        .filter((w) => w.length > 3)
-    )
-  );
-
-  // 5) Fetch jobs & compute match scores (title‐only)
+  // 3. Match against job database
   try {
     await connectMongo();
     const jobs = await JobModel.find();
 
     const matches = jobs
       .map((job) => {
-        const jobText = job.title.toLowerCase();
-        const hits = resumeWords.filter((w) =>
-          jobText.includes(w)
-        ).length;
-        const score = resumeWords.length
-          ? Math.round((hits / resumeWords.length) * 100)
-          : 0;
+        const jobTitle = (job.title || '').toLowerCase();
+        const jobDesc = (job.description || '').toLowerCase();
+
+        const titleMatches = titles.filter((t) => jobTitle.includes(t.toLowerCase())).length;
+        const skillMatches = skills.filter((s) => jobDesc.includes(s.toLowerCase())).length;
+
+        const totalMatches = titleMatches * 2 + skillMatches;
+        const maxPossible = (titles.length * 2 + skills.length) || 1;
+        
+        const score = Math.round((totalMatches / maxPossible) * 100);
+
         return {
           title: job.title,
           company: job.company,
           link: job.link,
+          description: job.description,
           matchScore: score,
         };
       })
