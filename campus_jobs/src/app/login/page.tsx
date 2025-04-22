@@ -21,8 +21,10 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
+      const { token } = await res.json(); // get token from response
+      localStorage.setItem('token', token); // store in localStorage
       setMessage('Login successful! Redirecting...');
-      setTimeout(() => router.push('/items'), 2000);
+      setTimeout(() => router.push('/'), 2000);
     } else {
       const error = await res.text();
       setMessage(error);

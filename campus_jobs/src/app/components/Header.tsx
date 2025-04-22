@@ -3,14 +3,22 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname(); // watches for route changes
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-  }, []);
+  }, [pathname]); // re-run on every page change
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    window.location.href = '/'; 
+  };
 
   return (
     <header className="header">
@@ -32,13 +40,7 @@ export default function Header() {
         {isLoggedIn ? (
           <>
             <Link href="/items/add">Add Job</Link>
-            <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                location.reload();
-              }}
-              className="btn secondary"
-            >
+            <button onClick={handleLogout} className="btn secondary">
               Logout
             </button>
           </>
