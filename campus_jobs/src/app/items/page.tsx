@@ -1,8 +1,9 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Item from '../components/Item';
 
-interface job {
+interface Job {
   _id: string;
   title: string;
   image?: string;
@@ -12,14 +13,21 @@ interface job {
 
 export default function ItemsPage() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [jobs, setJobs] = useState<job[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
-  const [brokenJobs, setBrokenJobs] = useState<job[]>([]);
+  const [brokenJobs, setBrokenJobs] = useState<Job[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('');
   const [uniqueCompanies, setUniqueCompanies] = useState<string[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('favorites');
+      return stored ? (JSON.parse(stored) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   useEffect(() => {
@@ -28,6 +36,7 @@ export default function ItemsPage() {
   }, []);
 
   const toggleFavorite = (jobId: string) => {
+    if (!loggedIn) return;
     const updated = favorites.includes(jobId)
       ? favorites.filter(id => id !== jobId)
       : [...favorites, jobId];
@@ -35,31 +44,29 @@ export default function ItemsPage() {
     localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = jobs.filter(job => {
     const matchesQuery =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company?.toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchCompany = selectedCompany === '' || job.company === selectedCompany;
     const matchFavorite = !showFavoritesOnly || favorites.includes(job._id);
-
     return matchesQuery && matchCompany && matchFavorite;
   });
 
   const fetchJobs = async () => {
     const res = await fetch('/api/jobs');
-    const data = await res.json();
+    const data = (await res.json()) as { jobs: Job[] };
 
-    const valid = data.jobs.filter((job: job) => job.title !== 'Untitled');
-    const broken = data.jobs.filter((job: job) => job.title === 'Untitled');
+    const valid = data.jobs.filter(job => job.title !== 'Untitled');
+    const broken = data.jobs.filter(job => job.title === 'Untitled');
 
     setJobs(valid);
     setBrokenJobs(broken);
 
-    const companySet: Set<string> = new Set(
-      valid.map((job: { company: any }) => job.company || 'Unknown')
-    );
-    setUniqueCompanies(Array.from(companySet).sort());
+    const companies = Array.from(
+      new Set(valid.map(j => j.company || 'Unknown'))
+    ).sort();
+    setUniqueCompanies(companies);
   };
 
   const syncJobs = async () => {
@@ -91,31 +98,33 @@ export default function ItemsPage() {
           type="text"
           placeholder="Search jobs by title or department..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(e.target.value)}
           className="search-input"
         />
 
         <select
           className="company-select"
           value={selectedCompany}
-          onChange={(e) => setSelectedCompany(e.target.value)}
+          onChange={e => setSelectedCompany(e.target.value)}
         >
           <option value="">All Departments</option>
-          {uniqueCompanies.map((company) => (
+          {uniqueCompanies.map(company => (
             <option key={company} value={company}>
               {company}
             </option>
           ))}
         </select>
 
-        <label className="favorite-toggle">
-          <input
-            type="checkbox"
-            checked={showFavoritesOnly}
-            onChange={() => setShowFavoritesOnly(!showFavoritesOnly)}
-          />
-          Favorites Only
-        </label>
+        {loggedIn && (
+          <label className="favorite-toggle">
+            <input
+              type="checkbox"
+              checked={showFavoritesOnly}
+              onChange={() => setShowFavoritesOnly(prev => !prev)}
+            />
+            Favorites Only
+          </label>
+        )}
       </div>
 
       <div className="jobs-found-sync">
@@ -125,7 +134,7 @@ export default function ItemsPage() {
             {loading ? 'Syncing...' : 'Sync Jobs'}
           </button>
           {loggedIn && (
-            <button onClick={() => setEditMode(!editMode)}>
+            <button onClick={() => setEditMode(prev => !prev)}>
               {editMode ? 'Done Editing' : 'Edit Jobs'}
             </button>
           )}
@@ -133,7 +142,7 @@ export default function ItemsPage() {
       </div>
 
       <div className="item-list">
-        {filteredJobs.map((job) => (
+        {filteredJobs.map(job => (
           <Item
             key={job._id}
             title={job.title}
@@ -141,7 +150,7 @@ export default function ItemsPage() {
             company={job.company}
             link={job.link}
             jobId={job._id}
-            showDelete={editMode && loggedIn}
+            showDelete={editMode}
             onDelete={fetchJobs}
             isFavorite={favorites.includes(job._id)}
             onToggleFavorite={() => toggleFavorite(job._id)}
@@ -164,13 +173,13 @@ export default function ItemsPage() {
                 jobId={job._id}
                 showDelete={editMode}
                 onDelete={fetchJobs}
+                loggedIn={loggedIn}
               />
             ))}
           </div>
         </>
       )}
 
-      {/* Your styles remain unchanged */}
       <style jsx>{`
         .button-group {
           display: flex;
@@ -232,7 +241,6 @@ export default function ItemsPage() {
           cursor: pointer;
           font-size: 1rem;
         }
-
         button:disabled {
           background-color: gray;
           cursor: not-allowed;

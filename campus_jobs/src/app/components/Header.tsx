@@ -7,18 +7,13 @@ import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const pathname = usePathname(); // watches for route changes
+  const pathname = usePathname();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('Header auth check:', token);
     setIsLoggedIn(!!token);
-  }, [pathname]); // re-run on every page change
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    window.location.href = '/'; 
-  };
+  }, [pathname]);
 
   return (
     <header className="header">
@@ -40,12 +35,21 @@ export default function Header() {
         {isLoggedIn ? (
           <>
             <Link href="/items/add">Add Job</Link>
-            <button onClick={handleLogout} className="btn secondary">
+            <button
+              onClick={() => {
+                localStorage.removeItem('token');
+                location.reload();
+              }}
+              className="btn secondary"
+            >
               Logout
             </button>
           </>
         ) : (
-          <Link href="/login">Login / Signup</Link>
+          <>
+            <Link href="/login">Login</Link>
+            <Link href="/signup">Signup</Link>
+          </>
         )}
       </nav>
 
@@ -56,11 +60,13 @@ export default function Header() {
           align-items: center;
           padding: 1.5rem 2rem;
           background-color: #f5f5f5;
+          font-family: inherit;
         }
         .logo-link {
           display: flex;
           align-items: center;
           text-decoration: none;
+          font-family: inherit;
         }
         .logo {
           display: flex;
@@ -78,6 +84,7 @@ export default function Header() {
         }
         .nav :global(a),
         .nav button {
+          font: inherit;
           font-size: 1.1rem;
           color: #333;
           padding: 0.5rem 1rem;
