@@ -2,10 +2,17 @@
 'use client'; // this page uses client‑side hooks
 
 import Link from 'next/link';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useEffect, useState } from 'react';
+
 
 export default function Home() {
-  const { user, error, isLoading } = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
 
   return (
     <div className="home">
@@ -26,7 +33,7 @@ export default function Home() {
               Browse Jobs
             </Link>
 
-            {user ? (
+            {isLoggedIn ? (
               <Link
                 href="/splash"
                 className="btn secondary"
@@ -166,13 +173,13 @@ export default function Home() {
       <section className="call-to-action">
         <h2>Ready to Take the Next Step?</h2>
         <p>Join our community and let UGA Job Finder propel your career forward.</p>
-        <a
-          href="/api/auth/login?screen_hint=signup"
+        <Link
+          href="/login"
           className="btn primary"
           onMouseUp={(e) => e.currentTarget.blur()}
         >
-          Get Started Now
-        </a>
+        Get Started Now
+        </Link>
       </section>
 
       {/* GLOBAL styles so the disabled state and auth-note are scoped */}

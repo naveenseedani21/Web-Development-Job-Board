@@ -1,16 +1,19 @@
-// src/app/components/Header.tsx
 'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
-  const { user, error, isLoading } = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <header className="header">
-      {/* Logo now links home */}
       <Link href="/" className="logo-link">
         <div className="logo">
           <Image
@@ -26,17 +29,21 @@ export default function Header() {
       <nav className="nav">
         <Link href="/items">Jobs</Link>
 
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p>Error</p>
-        ) : user ? (
+        {isLoggedIn ? (
           <>
             <Link href="/items/add">Add Job</Link>
-            <a href="/api/auth/logout">Logout</a>
+            <button
+              onClick={() => {
+                localStorage.removeItem('token');
+                location.reload();
+              }}
+              className="btn secondary"
+            >
+              Logout
+            </button>
           </>
         ) : (
-          <a href="/api/auth/login">Login / Signup</a>
+          <Link href="/login">Login / Signup</Link>
         )}
       </nav>
 
@@ -67,21 +74,19 @@ export default function Header() {
           align-items: center;
           gap: 1.5rem;
         }
-        .nav :global(a) {
+        .nav :global(a),
+        .nav button {
           font-size: 1.1rem;
           color: #333;
           padding: 0.5rem 1rem;
-          transition: color 0.3s ease;
+          background: none;
+          border: none;
+          cursor: pointer;
           text-decoration: none;
         }
-        .nav :global(a:hover) {
+        .nav :global(a:hover),
+        .nav button:hover {
           color: #ba0c2f;
-        }
-        .nav p {
-          font-size: 1.1rem;
-          color: #333;
-          margin: 0;
-          padding: 0.5rem 1rem;
         }
       `}</style>
     </header>

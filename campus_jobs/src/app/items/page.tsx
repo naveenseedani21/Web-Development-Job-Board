@@ -1,9 +1,6 @@
-// app/items/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import Item from '../components/Item';
-import { useUser } from '@auth0/nextjs-auth0/client';
-
 
 interface job {
   _id: string;
@@ -14,8 +11,7 @@ interface job {
 }
 
 export default function ItemsPage() {
-  const { user } = useUser();
-  const loggedIn = !!user;
+  const [loggedIn, setLoggedIn] = useState(false);
   const [jobs, setJobs] = useState<job[]>([]);
   const [loading, setLoading] = useState(false);
   const [brokenJobs, setBrokenJobs] = useState<job[]>([]);
@@ -26,6 +22,10 @@ export default function ItemsPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setLoggedIn(!!token);
+  }, []);
 
   const toggleFavorite = (jobId: string) => {
     const updated = favorites.includes(jobId)
@@ -33,27 +33,22 @@ export default function ItemsPage() {
       : [...favorites, jobId];
     setFavorites(updated);
     localStorage.setItem('favorites', JSON.stringify(updated));
-  }
+  };
 
   const filteredJobs = jobs.filter((job) => {
     const matchesQuery =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchCompany = 
-      selectedCompany === '' || job.company === selectedCompany;
-    
-    const matchFavorite =
-      !showFavoritesOnly || favorites.includes(job._id);
-  
+    const matchCompany = selectedCompany === '' || job.company === selectedCompany;
+    const matchFavorite = !showFavoritesOnly || favorites.includes(job._id);
+
     return matchesQuery && matchCompany && matchFavorite;
   });
-  
+
   const fetchJobs = async () => {
     const res = await fetch('/api/jobs');
     const data = await res.json();
-
-    console.log('Fetched jobs:', data.jobs);
 
     const valid = data.jobs.filter((job: job) => job.title !== 'Untitled');
     const broken = data.jobs.filter((job: job) => job.title === 'Untitled');
@@ -61,7 +56,9 @@ export default function ItemsPage() {
     setJobs(valid);
     setBrokenJobs(broken);
 
-    const companySet: Set<string> = new Set(valid.map((job: { company: any; }) => job.company || 'Unknown'));
+    const companySet: Set<string> = new Set(
+      valid.map((job: { company: any }) => job.company || 'Unknown')
+    );
     setUniqueCompanies(Array.from(companySet).sort());
   };
 
@@ -72,7 +69,6 @@ export default function ItemsPage() {
       if (!res.ok) throw new Error('Sync failed');
       const data = await res.json();
       await fetchJobs();
-      
       alert(`Synced ${data.count} jobs!`);
     } catch (err) {
       console.error('Sync error:', err);
@@ -89,7 +85,8 @@ export default function ItemsPage() {
   return (
     <div className="items">
       <h2>Job Listings</h2>
-      <div className="search-filter-sync-wrapper"> 
+
+      <div className="search-filter-sync-wrapper">
         <input
           type="text"
           placeholder="Search jobs by title or department..."
@@ -110,6 +107,7 @@ export default function ItemsPage() {
             </option>
           ))}
         </select>
+
         <label className="favorite-toggle">
           <input
             type="checkbox"
@@ -126,7 +124,7 @@ export default function ItemsPage() {
           <button onClick={syncJobs} disabled={loading}>
             {loading ? 'Syncing...' : 'Sync Jobs'}
           </button>
-          {user && (
+          {loggedIn && (
             <button onClick={() => setEditMode(!editMode)}>
               {editMode ? 'Done Editing' : 'Edit Jobs'}
             </button>
@@ -135,46 +133,44 @@ export default function ItemsPage() {
       </div>
 
       <div className="item-list">
-      {filteredJobs.map((job) => {
-        console.log('Rendering job:', job); // debug this
-        return (
-          <Item 
+        {filteredJobs.map((job) => (
+          <Item
             key={job._id}
             title={job.title}
             image={job.image}
             company={job.company}
             link={job.link}
             jobId={job._id}
-            showDelete={editMode && !!user}
+            showDelete={editMode && loggedIn}
             onDelete={fetchJobs}
             isFavorite={favorites.includes(job._id)}
             onToggleFavorite={() => toggleFavorite(job._id)}
             loggedIn={loggedIn}
           />
-        );
-      })}
+        ))}
       </div>
 
       {brokenJobs.length > 0 && (
         <>
-          <h3 style={{ marginTop: '2rem' }}> Jobs Missing Titles</h3>
+          <h3 style={{ marginTop: '2rem' }}>Jobs Missing Titles</h3>
           <div className="item-list">
             {brokenJobs.map((job, i) => (
-              <Item 
-              key={i} 
-              title={job.title} 
-              image={job.image}
-              company={job.company}
-              link={job.link}
-              jobId={job._id}
-              showDelete={editMode}
-              onDelete={fetchJobs}
+              <Item
+                key={i}
+                title={job.title}
+                image={job.image}
+                company={job.company}
+                link={job.link}
+                jobId={job._id}
+                showDelete={editMode}
+                onDelete={fetchJobs}
               />
             ))}
-        </div>
+          </div>
         </>
       )}
 
+      {/* Your styles remain unchanged */}
       <style jsx>{`
         .button-group {
           display: flex;
@@ -236,7 +232,7 @@ export default function ItemsPage() {
           cursor: pointer;
           font-size: 1rem;
         }
-        
+
         button:disabled {
           background-color: gray;
           cursor: not-allowed;
