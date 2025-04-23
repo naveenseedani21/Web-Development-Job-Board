@@ -37,6 +37,22 @@ export default function Item({
   const [randomImage] = useState(getRandomStockImage());
   const displayImage = image?.trim() ? image : randomImage;
 
+  const toggleSave = async () => {
+    const method = isFavorite ? 'DELETE' : 'POST';
+
+    const res = await fetch('/api/users/save-job', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId }),
+    });
+
+    if (res.ok) {
+      onToggleFavorite?.(); // Still update local UI state
+    } else {
+      alert('Failed to update save');
+    }
+  };
+
   return (
     <div className={`item ${showDelete ? 'editing' : ''}`}>
       {showDelete && jobId && (
@@ -66,14 +82,16 @@ export default function Item({
             <div className="heart-row">
               <button className="favorite" onClick={(e) => {
                 e.preventDefault();
-                onToggleFavorite?.();
-              }}>
+                toggleSave();
+              }}
+              >
                 {isFavorite ? '❤️' : '🤍'}
               </button>
             </div>
           )}
         </div>
       )}
+      
       <a
         href={link || '#'}
         target="_blank"

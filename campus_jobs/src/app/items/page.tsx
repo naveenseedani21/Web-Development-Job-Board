@@ -31,8 +31,21 @@ export default function ItemsPage() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setLoggedIn(!!token);
+    const fetchFavorites = async () => {
+      const token = localStorage.getItem('token');
+      setLoggedIn(!!token);
+      if (!token) return;
+  
+      try {
+        const res = await fetch('/api/users/me');
+        const data = await res.json();
+        setFavorites(data.savedJobs || []);
+      } catch (err) {
+        console.error('Failed to fetch favorites', err);
+      }
+    };
+  
+    fetchFavorites();
   }, []);
 
   const toggleFavorite = (jobId: string) => {

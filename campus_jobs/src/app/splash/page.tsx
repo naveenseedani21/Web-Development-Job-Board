@@ -88,8 +88,6 @@ export default function Splash() {
                 <h3>{job.title}</h3>
                 <p><strong>Company:</strong> {job.company}</p>
                 <p><strong>Match Score:</strong> {job.matchScore}%</p>
-                <p><strong>Matched Skills:</strong> {(job.matchedSkills || []).join(', ')}</p>
-                <p><strong>Description:</strong> {(job.description || []).join(', ')}</p>
               </div>
             ))}
           </div>

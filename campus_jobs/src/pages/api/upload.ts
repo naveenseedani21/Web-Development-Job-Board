@@ -1,4 +1,5 @@
 // src/pages/api/upload.ts
+import dotenv from 'dotenv';
 import connectMongo from '@/lib/mongo';
 import { File as FormidableFile, IncomingForm } from 'formidable';
 import fs from 'fs';
@@ -6,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import os from 'os';
 import JobModel from '../../../models/Job';
 import { fetch } from 'undici';
+dotenv.config();
 
 console.log("✅ ENV VALUE:", process.env.RESUME_PARSER_KEY);
 
@@ -20,8 +22,7 @@ export const config = {
  */
 async function extractTitleAndSkills(file: FormidableFile): Promise<{ titles: string[]; skills: string[] }> {
   const filePath = file.filepath;
-  // const apiKey = process.env.RESUME_PARSER_KEY;
-  const apiKey = 'L4IDub8Im7B0hUX0peo4RrQOGL6ytZx9';
+  const apiKey = process.env.RESUME_PARSER_KEY;
   console.log("API KEY?", process.env.RESUME_PARSER_KEY);
   if (!apiKey) throw new Error("Missing Resume Parser API key");
   if (!filePath) throw new Error('Missing Resume Parser API key');
