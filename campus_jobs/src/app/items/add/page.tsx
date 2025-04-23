@@ -11,11 +11,16 @@ export default function AddItemPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const defaultImage = '/default-image1.jpeg';
     try {
       const res = await fetch('/api/jobs/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, image, company }),
+        body: JSON.stringify({ 
+          title, 
+          image: image || defaultImage,
+          company, 
+        }),
       });
       if (!res.ok) throw new Error('Failed to add job');
       setTitle('');
@@ -52,7 +57,6 @@ export default function AddItemPage() {
               value={image}
               onChange={e => setImage(e.target.value)}
               placeholder="https://example.com/logo.png"
-              required
             />
           </div>
           <div className="field-group">
